@@ -1,10 +1,10 @@
 <template>
     <nav class="right">
         <ul class="tech">
-            <li v-for="img in imgs" >
-                <img class="tech_img" :src="require(`@/assets/forList/${img.title}.png`)">
-                <h3>{{img.title}}</h3>
-                <p>{{img.title}} is ...</p>
+            <li v-for="topic in topics" >
+                <img class="tech_img" :src=topic.thumbnail >
+                <h3>{{topic.name}}</h3>
+                <p>{{topic.name}} is ...</p>
             </li>
         </ul>
     </nav>
@@ -12,13 +12,22 @@
 <script>
 export default {
     name : "TechList"
+    ,created: function () {
+        this.$http.get(`/api/topics/`)
+            .then(response => {
+                let { data } = response
+                data.forEach(topic => {
+                    this.$http.get(`/api/topics/thumbnail/${topic.thumbnail}`)
+                        .then(response => {
+                            topic.thumbnail = `data:image/png;base64,${response.data}`
+                        })
+                })
+                this.topics = data;
+            })
+    }
     ,data: function(){
-      return{
-        imgs:[{title:"android"},{title:"angular"},{title:"aws"},{title:"c"},{title:"cpp"},
-                {title:"csharp"},{title:"css"},{title:"django"},{title:"docker"},{title:"flask"},
-                {title:"git"},{title:"html"},{title:"ios"},{title:"java"},{title:"javascript"},
-                {title:"mongodb"},{title:"mysql"},{title:"nodejs"},{title:"php"},{title:"python"},
-                {title:"react"},{title:"spring-boot"},{title:"vue"}]
+        return{
+            topics: {}
       }  
     }
 }
